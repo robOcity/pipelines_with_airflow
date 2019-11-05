@@ -109,3 +109,6 @@ settings.json
 # airflow
 airflow
 unittests.cfg
+
+# macOS
+.DS_Store
