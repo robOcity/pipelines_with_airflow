@@ -1,7 +1,6 @@
-from airflow.hooks.postgres_hook import PostgresHook
 from airflow.models import BaseOperator
-from airflow.contrib.hooks.aws_hook import AwsHook
 from airflow.hooks.postgres_hook import PostgresHook
+from airflow.contrib.hooks.aws_hook import AwsHook
 from airflow.utils.decorators import apply_defaults
 
 
@@ -19,13 +18,13 @@ class StageToRedshiftOperator(BaseOperator):
         *args,
         **kwargs,
     ):
+        super(StageToRedshiftOperator, self).__init__(*args, **kwargs)
         self.redshift_conn_id = redshift_conn_id
         self.aws_credentials_id = aws_credentials_id
         self.table = table
         self.s3_path = f"s3://{s3_bucket}/{s3_key}"
         self.role_arn = role_arn
         self.aws_region = aws_region
-        super(StageToRedshiftOperator, self).__init__(*args, **kwargs)
 
     def build_cmd(self):
         copy_cmd = f"""
@@ -42,9 +41,7 @@ class StageToRedshiftOperator(BaseOperator):
         return copy_cmd
 
     def execute(self, context):
-        self.log.info(
-            "\n*** StageToRedshiftOperator: Copying data from S3 JSON files to Redshift ***"
-        )
+        self.log.info("\n*** StageToRedshiftOperator: Copying data from S3 to Redshift ***")
         aws_hook = AwsHook(self.aws_credentials_id)
         credentials = aws_hook.get_credentials()
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
