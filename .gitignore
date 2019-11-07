@@ -106,9 +106,12 @@ venv.bak/
 # vscode
 settings.json
 
+
 # airflow
-airflow
+airflow.db
 unittests.cfg
+*.pid
+logs/
 
 # macOS
 .DS_Store
