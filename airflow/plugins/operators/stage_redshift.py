@@ -1,16 +1,19 @@
-from airflow.models import BaseOperator
 from airflow.hooks.postgres_hook import PostgresHook
 from airflow.contrib.hooks.aws_hook import AwsHook
+from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 
 
 class StageToRedshiftOperator(BaseOperator):
+    ui_color = "#358140"
+
     @apply_defaults
     def __init__(
         self,
         redshift_conn_id="",
         aws_credentials_id="",
-        table="",
+        destination_table="",
+        json_format_file="",
         s3_bucket="",
         s3_key="",
         role_arn="",
@@ -18,20 +21,22 @@ class StageToRedshiftOperator(BaseOperator):
         *args,
         **kwargs,
     ):
+
         super(StageToRedshiftOperator, self).__init__(*args, **kwargs)
         self.redshift_conn_id = redshift_conn_id
         self.aws_credentials_id = aws_credentials_id
-        self.table = table
-        self.s3_path = f"s3://{s3_bucket}/{s3_key}"
+        self.destination_table = destination_table
+        self.json_format_file = json_format_file
+        self.s3_source_path = f"s3://{s3_bucket}/{s3_key}"
         self.role_arn = role_arn
         self.aws_region = aws_region
 
     def build_cmd(self):
         copy_cmd = f"""
-        COPY {self.table}
-        FROM '{self.s3_src}'
+        COPY {self.destination_table}
+        FROM '{self.s3_source_path}'
         IAM_ROLE '{self.role_arn}'
-        JSON '{self.s3_dest}' truncatecolumns
+        JSON '{self.json_format_file}' truncatecolumns
         TIMEFORMAT 'epochmillisecs'
         REGION '{self.aws_region}'
         COMPUPDATE off
@@ -46,9 +51,12 @@ class StageToRedshiftOperator(BaseOperator):
         credentials = aws_hook.get_credentials()
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
 
-        self.log.info(f"Dropping {self.table} table from Redshift")
-        redshift.run(f"DROP TABLE IF EXISTS {self.table}")
+        self.log.info(f"Dropping {self.destination_table} table from Redshift")
+        redshift.run(f"DROP TABLE IF EXISTS {self.destination_table}")
 
-        self.log.info(f"Copying data from {s3_path} to Redshift {self.table} table")
+        self.log.info(
+            f"Copying data from {self.s3_source_path} to Redshift {self.destination_table} table"
+        )
         redshift.run(self.build_cmd())
         self.log.info("*** StageToRedshiftOperator: Complete ***\n")
+
