@@ -48,9 +48,24 @@ stage_events_to_redshift_task = StageToRedshiftOperator(
     redshift_conn_id="redshift",
     aws_credentials_id="aws_credentials",
     destination_table="public.staging_events",
-    json_format_file="s3://dend-util/data/events_log_jsonpath.json",
+    json_paths="s3://dend-util/data/events_log_jsonpath.json",
     s3_bucket="udacity-dend",
     s3_key="log_json_path.json",
+    role_arn="arn:aws:iam::921412997039:role/dwhRole",
+    aws_region="us-west-2",
+)
+
+
+stage_songs_to_redshift_task = StageToRedshiftOperator(
+    task_id="stage_songs_to_redshift_task",
+    dag=dag,
+    redshift_conn_id="redshift",
+    aws_credentials_id="aws_credentials",
+    destination_table="public.staging_songs",
+    json_paths="auto",
+    s3_bucket="udacity-dend",
+    # TODO - use all song data, not just one song
+    s3_key="song-data/A/V/Y/TRAVYPH128F149B902.json",
     role_arn="arn:aws:iam::921412997039:role/dwhRole",
     aws_region="us-west-2",
 )
@@ -92,4 +107,7 @@ stage_events_to_redshift_task = StageToRedshiftOperator(
 
 end_task = DummyOperator(task_id="Stop_execution", dag=dag)
 
-start_task >> drop_tables_task >> create_tables_task >> stage_events_to_redshift_task >> end_task
+start_task >> drop_tables_task >> create_tables_task >> [
+    stage_events_to_redshift_task,
+    stage_songs_to_redshift_task,
+] >> end_task
