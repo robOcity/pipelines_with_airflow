@@ -13,7 +13,7 @@ class StageToRedshiftOperator(BaseOperator):
         redshift_conn_id="",
         aws_credentials_id="",
         destination_table="",
-        json_format_file="",
+        json_paths="",
         s3_bucket="",
         s3_key="",
         role_arn="",
@@ -26,7 +26,7 @@ class StageToRedshiftOperator(BaseOperator):
         self.redshift_conn_id = redshift_conn_id
         self.aws_credentials_id = aws_credentials_id
         self.destination_table = destination_table
-        self.json_format_file = json_format_file
+        self.json_paths = json_paths
         self.s3_source_path = f"s3://{s3_bucket}/{s3_key}"
         self.role_arn = role_arn
         self.aws_region = aws_region
@@ -37,9 +37,10 @@ class StageToRedshiftOperator(BaseOperator):
         FROM '{self.s3_source_path}'
         ACCESS_KEY_ID '{credentials.access_key}'
         SECRET_ACCESS_KEY '{credentials.secret_key}'
-        FORMAT AS JSON '{self.json_format_file}' truncatecolumns
+        JSON '{self.json_paths}' truncatecolumns
         TIMEFORMAT 'epochmillisecs'
-        REGION '{self.aws_region}';
+        REGION '{self.aws_region}'
+        MAXERROR 3;
         """
         self.log.info(f"Copy command: {copy_cmd}")
         return copy_cmd
