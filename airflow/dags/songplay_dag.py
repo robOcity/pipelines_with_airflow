@@ -26,34 +26,20 @@ dag = DAG(
 
 start_task = DummyOperator(task_id="Begin_execution", dag=dag)
 
+drop_tables_task = PostgresOperator(
+    # Note: create_tables.sql needs to be in the airflow/dags folder in order to be picked up
+    task_id="drop_tables_task",
+    dag=dag,
+    postgres_conn_id="redshift",
+    sql="drop_tables.sql",
+)
+
 create_tables_task = PostgresOperator(
+    # Note: create_tables.sql needs to be in the airflow/dags folder in order to be picked up
     task_id="create_tables_task",
     dag=dag,
     postgres_conn_id="redshift",
-    database="pipedb",
-    autocommit=True,
-    sql=f"""
-    DROP TABLE IF EXISTS event_staging;
-    CREATE TABLE event_staging (
-	artist varchar(256),
-	auth varchar(256),
-	firstname varchar(256),
-	gender varchar(256),
-	iteminsession int4,
-	lastname varchar(256),
-	length numeric(18,0),
-	"level" varchar(256),
-	location varchar(256),
-	"method" varchar(256),
-	page varchar(256),
-	registration numeric(18,0),
-	sessionid int4,
-	song varchar(256),
-	status int4,
-	ts int8,
-	useragent varchar(256),
-	userid int4
-);""",
+    sql="create_tables.sql",
 )
 
 stage_events_to_redshift_task = StageToRedshiftOperator(
@@ -61,7 +47,7 @@ stage_events_to_redshift_task = StageToRedshiftOperator(
     dag=dag,
     redshift_conn_id="redshift",
     aws_credentials_id="aws_credentials",
-    destination_table="event_staging",
+    destination_table="public.staging_events",
     json_format_file="s3://dend-util/data/events_log_jsonpath.json",
     s3_bucket="udacity-dend",
     s3_key="log_json_path.json",
@@ -106,4 +92,4 @@ stage_events_to_redshift_task = StageToRedshiftOperator(
 
 end_task = DummyOperator(task_id="Stop_execution", dag=dag)
 
-start_task >> create_tables_task >> stage_events_to_redshift_task >> end_task
+start_task >> drop_tables_task >> create_tables_task >> stage_events_to_redshift_task >> end_task
