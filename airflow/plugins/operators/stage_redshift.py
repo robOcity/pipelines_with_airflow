@@ -31,16 +31,15 @@ class StageToRedshiftOperator(BaseOperator):
         self.role_arn = role_arn
         self.aws_region = aws_region
 
-    def build_cmd(self):
+    def build_cmd(self, credentials):
         copy_cmd = f"""
         COPY {self.destination_table}
         FROM '{self.s3_source_path}'
-        IAM_ROLE '{self.role_arn}'
-        JSON '{self.json_format_file}' truncatecolumns
+        ACCESS_KEY_ID '{credentials.access_key}'
+        SECRET_ACCESS_KEY '{credentials.secret_key}'
+        FORMAT AS JSON '{self.json_format_file}' truncatecolumns
         TIMEFORMAT 'epochmillisecs'
-        REGION '{self.aws_region}'
-        COMPUPDATE off
-        MAXERROR 3;
+        REGION '{self.aws_region}';
         """
         self.log.info(f"Copy command: {copy_cmd}")
         return copy_cmd
@@ -51,12 +50,9 @@ class StageToRedshiftOperator(BaseOperator):
         credentials = aws_hook.get_credentials()
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
 
-        self.log.info(f"Dropping {self.destination_table} table from Redshift")
-        redshift.run(f"DROP TABLE IF EXISTS {self.destination_table}")
-
         self.log.info(
             f"Copying data from {self.s3_source_path} to Redshift {self.destination_table} table"
         )
-        redshift.run(self.build_cmd())
+        redshift.run(self.build_cmd(credentials))
         self.log.info("*** StageToRedshiftOperator: Complete ***\n")
 
