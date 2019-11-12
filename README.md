@@ -36,6 +36,12 @@ Here I am using my project's repository to store all my Airflow code and configu
 
 Running Airflow locally is simplist using Docker.  The reason being without a full fledged database running (e.g., PostgreSQL) a local Python install is limited to running all tasks sequentially.
 
+Taking a snapshot of your Redshift cluster enables the cluster to be restored to its state at the time of the backup.  This is useful during development and testing.  When you do the Postgres connection remains the same, but:
+
+* You need to reset the IAM role once the cluster is up and running.
+
+* You need to choose the Security Group that enables remote access.  For my simple setup, I am using password-based authentication.  
+
 ## Useful Airflow Commands
 
 Aiflow has a command line interface ([CLI](https://airflow.apache.org/cli.html#)) that is very useful in finding issues with DAG objects.
