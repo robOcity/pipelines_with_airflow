@@ -12,8 +12,23 @@ Here is the DAG defining the sequence of these operations.
 
 ![DAG](./images/dag.png)
 
-## Files
+## Key Files
 
+1. *airflow/dags/songplay_dag.py* - Defines the tasks and arranges them in DAG.
+
+1. *airflow/plugins/operators/stage_redshift.py* - Loads data from S3 to Redshift using the Redshift's `COPY` command.
+
+1. *airflow/plugins/operators/data_quality.py* - Defines the DataQualityOperator that assures the tables are populated with data.
+
+1. *airflow/plugins/operators/load_dimension.py* - Defines the LoadDimensionOperator that loads data from the staging to dimension tables.
+
+1. *airflow/plugins/operators/load_fact.py* - Defines the LoadFactOperator that loads data from the staging to fact tables.
+
+1. *airflow/dags/create_tables.sql* - SQL script that creates all the tables in the database.
+
+1. *airflow/dags/create_tables.sql* - SQL script that drops all the tables in the database.
+
+1. *airflow/plugins/sql_queries.py* - Contains the `INSERT` queries that transform the data in the staging tables into the dimension and fact tables of a star-schema.
 
 ## Configuration
 
