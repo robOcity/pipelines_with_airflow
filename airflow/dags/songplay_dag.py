@@ -120,7 +120,15 @@ run_quality_checks = DataQualityOperator(
     dag=dag,
     redshift_conn_id="redshift",
     target_db="pipedb",
-    sql="",
+    tables=[
+        "public.staging_events",
+        "public.staging_songs",
+        "public.songplays",
+        "public.artists",
+        "public.time",
+        "public.songs",
+        "public.users",
+    ],
 )
 
 end_task = DummyOperator(task_id="Stop_execution", dag=dag)
