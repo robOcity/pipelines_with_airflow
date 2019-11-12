@@ -8,7 +8,7 @@ class DataQualityOperator(BaseOperator):
     ui_color = "#89DA59"
 
     @apply_defaults
-    def __init__(self, redshift_conn_id="", table="", *args, **kwargs):
+    def __init__(self, redshift_conn_id="", tables=None, *args, **kwargs):
 
         super(DataQualityOperator, self).__init__(*args, **kwargs)
         self.tables = tables
