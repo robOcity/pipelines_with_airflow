@@ -1,6 +1,6 @@
 # Data Pipelines with Airflow
 
-How can you automate and monitor data pipelines that support your analytical users?  One popular way is to use [Apache Airflow](https://airflow.apache.org/).  Describing complicated workflows as Directed Acyclic Graphs (DAGs), where each node is task directing the processing of the data.  The edges that connect the nodes order the sequence of tasks.  In this project, I:
+How can you automate and monitor data pipelines that support your analytical users?  One popular way is to use [Apache Airflow](https://airflow.apache.org/).  Describing complicated workflows as Directed Acyclic Graphs (DAGs), where each node is task directing the processing of the data.  The edges that connect the nodes order the sequence of tasks.  DAGs run task that invoke worker processes that do the "real" work while the DAG orchestrates their efforts.  
 
 1. Extract and load (EL) data from JSON files stored on [AWS S3](https://aws.amazon.com/s3/) into staging tables on [AWS Redshift](https://aws.amazon.com/redshift/). No transformations are made to the data during this step.
 
