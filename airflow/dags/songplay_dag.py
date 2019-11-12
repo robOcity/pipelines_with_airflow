@@ -55,7 +55,6 @@ stage_events_to_redshift_task = StageToRedshiftOperator(
     aws_region="us-west-2",
 )
 
-
 stage_songs_to_redshift_task = StageToRedshiftOperator(
     task_id="stage_songs_to_redshift_task",
     dag=dag,
@@ -64,7 +63,8 @@ stage_songs_to_redshift_task = StageToRedshiftOperator(
     destination_table="public.staging_songs",
     json_paths="auto",
     s3_bucket="udacity-dend",
-    s3_key="song-data",
+    # TODO - Remove /A/Z to process all songs
+    s3_key="song-data/A/Z",
     role_arn="arn:aws:iam::921412997039:role/dwhRole",
     aws_region="us-west-2",
 )
@@ -128,9 +128,12 @@ end_task = DummyOperator(task_id="Stop_execution", dag=dag)
 start_task >> drop_tables_task >> create_tables_task >> [
     stage_events_to_redshift_task,
     stage_songs_to_redshift_task,
-] >> load_songplays_fact_table >> [
-    load_user_dim_table,
-    load_song_dim_table,
-    load_artist_dim_table,
-    load_time_dim_table,
-] >> run_data_quality_checks >> end_task
+] >> end_task
+
+# TODO - combine into one dag
+# start_task >> load_songplays_table >> [
+#     load_user_dimension_table,
+#     load_song_dimension_table,
+#     load_artist_dimension_table,
+#     load_time_dimension_table,
+# ] >> run_quality_checks >> end_task
