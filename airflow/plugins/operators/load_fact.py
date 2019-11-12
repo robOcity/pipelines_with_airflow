@@ -12,7 +12,7 @@ class LoadFactOperator(BaseOperator):
         self, redshift_conn_id="", target_db="", destination_table="", sql="", *args, **kwargs
     ):
 
-        super(LoadDimensionOperator, self).__init__(*args, **kwargs)
+        super(LoadFactOperator, self).__init__(*args, **kwargs)
         self.redshift_conn_id = redshift_conn_id
         self.target_db = target_db
         self.destination_table = destination_table
@@ -20,8 +20,8 @@ class LoadFactOperator(BaseOperator):
 
     def execute(self, context):
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
-        sql = f"\nINSERT INTO {self.destination_table} ({self.sql})";
-        self.log.info(f"Loading data: {self.s3_target_db.{self.destination_table} table")
+        sql = f"\nINSERT INTO {self.destination_table} ({self.sql})"
+        self.log.info(f"Loading data: {self.s3_target_db}.{self.destination_table} table")
         self.log.info(f"Running SQL: {sql}")
         redshift.run(sql)
         self.log.info("*** LoadDimensionOperator: Complete ***\n")
