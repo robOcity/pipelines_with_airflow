@@ -10,7 +10,7 @@ How can you automate and monitor data pipelines that support your analytical use
 
 Here is the DAG defining the sequence of these operations.
 
-![DAG](.images/dag.png)
+![DAG](./images/dag.png)
 
 ## Files
 
@@ -18,6 +18,16 @@ Here is the DAG defining the sequence of these operations.
 ## Configuration
 
 Here I am using my project's repository to store all my Airflow code and configuration files.  This folder is known as AIRFLOW_HOME and it is stored in the environment.  I set the AIRFLOW_HOME by running ```export AIRFLOW_HOME=`pwd`/airflow```.
+
+## Helpful Airflow Commands
+
+Aiflow has a command line interface ([CLI](https://airflow.apache.org/cli.html#)) that is very useful in finding issues with DAG objects.
+
+* `airflow list_dags` - Lists all DAGS or produces a stack trace helping you find syntax problems.  
+
+* `airflow test dag_id task_id execution_date` - Runs a task without running all tasks in the DAG.
+
+* `airflow clear dag_id` - Clears the history of a partilar DAG from the database.
 
 ## References
 
@@ -30,3 +40,7 @@ Here I am using my project's repository to store all my Airflow code and configu
 1. [Awesome Apache Airflow](https://github.com/jghoman/awesome-apache-airflow#awesome-apache-airflow-) - Currated list of Airflow resources.
 
 1. [Can't import Airflow plugins](https://stackoverflow.com/questions/43907813/cant-import-airflow-plugins) - Stackoverflow post that discusses how to fix issues importing custom Airflow plugins.  
+
+1. [Data’s Inferno: 7 Circles of Data Testing Hell with Airflow](https://medium.com/wbaa/datas-inferno-7-circles-of-data-testing-hell-with-airflow-cef4adff58d8) - How to maintain complex pipelines so you don't get called a 2 AM.  In a word, _testing_.
+
+1. [Testing in Airflow Part 1 — DAG Validation Tests, DAG Definition Tests and Unit Tests](https://blog.usejournal.com/testing-in-airflow-part-1-dag-validation-tests-dag-definition-tests-and-unit-tests-2aa94970570c) - Seriously, testing Airflow seems highly worthwhile.
