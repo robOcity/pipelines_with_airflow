@@ -51,7 +51,7 @@ stage_events_to_redshift_task = StageToRedshiftOperator(
     destination_table="public.staging_events",
     json_paths="s3://dend-util/data/events_log_jsonpath.json",
     s3_bucket="udacity-dend",
-    s3_key="log_json_path.json",
+    s3_key="log_data",
     role_arn="arn:aws:iam::921412997039:role/dwhRole",
     aws_region="us-west-2",
 )
@@ -64,8 +64,7 @@ stage_songs_to_redshift_task = StageToRedshiftOperator(
     destination_table="public.staging_songs",
     json_paths="auto",
     s3_bucket="udacity-dend",
-    # TODO - Remove /A/Z to process all songs
-    s3_key="song-data/A/Z",
+    s3_key="song_data",
     role_arn="arn:aws:iam::921412997039:role/dwhRole",
     aws_region="us-west-2",
 )
