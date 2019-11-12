@@ -64,50 +64,66 @@ stage_songs_to_redshift_task = StageToRedshiftOperator(
     destination_table="public.staging_songs",
     json_paths="auto",
     s3_bucket="udacity-dend",
-    # TODO - use all song data, not just one song
-    s3_key="song-data/A/V/Y/TRAVYPH128F149B902.json",
+    s3_key="song-data",
     role_arn="arn:aws:iam::921412997039:role/dwhRole",
     aws_region="us-west-2",
 )
 
-# stage_songs_to_redshift = StageToRedshiftOperator(
-#     task_id='Stage_songs',
-#     dag=dag
-# )
+load_songplays_table = LoadFactOperator(
+    task_id="load_songplays_fact_table",
+    dag=dag,
+    redshift_conn_id="redshift",
+    target_db="pipedb",
+    destination_table="",
+    sql=SqlQueries.songplay_table_insert,
+)
 
-# load_songplays_table = LoadFactOperator(
-#     task_id='Load_songplays_fact_table',
-#     dag=dag
-# )
+load_user_dimension_table = LoadDimensionOperator(
+    task_id="load_user_dim_table",
+    dag=dag,
+    redshift_conn_id="redshift",
+    target_db="pipedb",
+    destination_table="",
+    sql=SqlQueries.user_table_insert,
+)
 
-# load_user_dimension_table = LoadDimensionOperator(
-#     task_id='Load_user_dim_table',
-#     dag=dag
-# )
+load_song_dimension_table = LoadDimensionOperator(
+    task_id="load_song_dim_table",
+    dag=dag,
+    redshift_conn_id="redshift",
+    target_db="pipedb",
+    destination_table="",
+    sql=SqlQueries.song_table_insert,
+)
 
-# load_song_dimension_table = LoadDimensionOperator(
-#     task_id='Load_song_dim_table',
-#     dag=dag
-# )
+load_artist_dimension_table = LoadDimensionOperator(
+    task_id="load_artist_dim_table",
+    dag=dag,
+    redshift_conn_id="redshift",
+    target_db="pipedb",
+    destination_table="",
+    sql=SqlQueries.artist_table_insert,
+)
 
-# load_artist_dimension_table = LoadDimensionOperator(
-#     task_id='Load_artist_dim_table',
-#     dag=dag
-# )
+load_time_dimension_table = LoadDimensionOperator(task_id="load_time_dim_table", dag=dag)
 
-# load_time_dimension_table = LoadDimensionOperator(
-#     task_id='Load_time_dim_table',
-#     dag=dag
-# )
-
-# run_quality_checks = DataQualityOperator(
-#     task_id='Run_data_quality_checks',
-#     dag=dag
-# )
+run_quality_checks = DataQualityOperator(
+    task_id="run_data_quality_checks",
+    dag=dag,
+    redshift_conn_id="redshift",
+    target_db="pipedb",
+    destination_table="",
+    sql="",
+)
 
 end_task = DummyOperator(task_id="Stop_execution", dag=dag)
 
 start_task >> drop_tables_task >> create_tables_task >> [
     stage_events_to_redshift_task,
     stage_songs_to_redshift_task,
-] >> end_task
+] >> load_songplays_fact_table >> [
+    load_user_dim_table,
+    load_song_dim_table,
+    load_artist_dim_table,
+    load_time_dim_table,
+] >> run_data_quality_checks >> end_task

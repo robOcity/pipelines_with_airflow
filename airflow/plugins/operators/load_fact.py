@@ -2,21 +2,27 @@ from airflow.hooks.postgres_hook import PostgresHook
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 
+
 class LoadFactOperator(BaseOperator):
 
-    ui_color = '#F98866'
+    ui_color = "#F98866"
 
     @apply_defaults
-    def __init__(self,
-                 # Define your operators params (with defaults) here
-                 # Example:
-                 # conn_id = your-connection-name
-                 *args, **kwargs):
+    def __init__(
+        self, redshift_conn_id="", target_db="", destination_table="", sql="", *args, **kwargs
+    ):
 
-        super(LoadFactOperator, self).__init__(*args, **kwargs)
-        # Map params here
-        # Example:
-        # self.conn_id = conn_id
+        super(LoadDimensionOperator, self).__init__(*args, **kwargs)
+        self.redshift_conn_id = redshift_conn_id
+        self.target_db = target_db
+        self.destination_table = destination_table
+        self.sql = sql
 
     def execute(self, context):
-        self.log.info('LoadFactOperator not implemented yet')
+        redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
+        sql = f"\nINSERT INTO {self.destination_table} ({self.sql})";
+        self.log.info(f"Loading data: {self.s3_target_db.{self.destination_table} table")
+        self.log.info(f"Running SQL: {sql}")
+        redshift.run(sql)
+        self.log.info("*** LoadDimensionOperator: Complete ***\n")
+
