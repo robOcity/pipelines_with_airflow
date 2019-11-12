@@ -37,10 +37,8 @@ class StageToRedshiftOperator(BaseOperator):
         FROM '{self.s3_source_path}'
         ACCESS_KEY_ID '{credentials.access_key}'
         SECRET_ACCESS_KEY '{credentials.secret_key}'
-        JSON '{self.json_paths}' truncatecolumns
-        TIMEFORMAT 'epochmillisecs'
-        REGION '{self.aws_region}'
-        MAXERROR 3;
+        JSON '{self.json_paths}'
+        COMPUPDATE OFF;
         """
         self.log.info(f"Copy command: {copy_cmd}")
         return copy_cmd
