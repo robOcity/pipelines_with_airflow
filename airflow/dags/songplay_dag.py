@@ -27,7 +27,7 @@ dag = DAG(
 start_task = DummyOperator(task_id="Begin_execution", dag=dag)
 
 drop_tables_task = PostgresOperator(
-    # Note: create_tables.sql needs to be in the airflow/dags folder in order to be picked up
+    # Note: drop_tables.sql needs to be in the airflow/dags folder in order to be picked up
     task_id="drop_tables_task",
     dag=dag,
     postgres_conn_id="redshift",
@@ -105,7 +105,14 @@ load_artist_dimension_table = LoadDimensionOperator(
     sql=SqlQueries.artist_table_insert,
 )
 
-load_time_dimension_table = LoadDimensionOperator(task_id="load_time_dim_table", dag=dag)
+load_time_dimension_table = LoadDimensionOperator(
+    task_id="load_time_dim_table",
+    dag=dag,
+    redshift_conn_id="redshift",
+    target_db="pipedb",
+    destination_table="",
+    sql=SqlQueries.time_table_insert,
+)
 
 run_quality_checks = DataQualityOperator(
     task_id="run_data_quality_checks",
