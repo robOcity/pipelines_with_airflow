@@ -21,6 +21,7 @@ dag = DAG(
     "songplay_dag",
     default_args=default_args,
     description="Load and transform data in Redshift with Airflow",
+    # TODO - Replace None with '0 * * * *'
     schedule_interval=None,  #'0 * * * *'
 )
 
@@ -74,7 +75,7 @@ load_songplays_table = LoadFactOperator(
     dag=dag,
     redshift_conn_id="redshift",
     target_db="pipedb",
-    destination_table="",
+    destination_table="public.songplays",
     sql=SqlQueries.songplay_table_insert,
 )
 
@@ -83,7 +84,7 @@ load_user_dimension_table = LoadDimensionOperator(
     dag=dag,
     redshift_conn_id="redshift",
     target_db="pipedb",
-    destination_table="",
+    destination_table="public.users",
     sql=SqlQueries.user_table_insert,
 )
 
@@ -92,7 +93,7 @@ load_song_dimension_table = LoadDimensionOperator(
     dag=dag,
     redshift_conn_id="redshift",
     target_db="pipedb",
-    destination_table="",
+    destination_table="public.songs",
     sql=SqlQueries.song_table_insert,
 )
 
@@ -101,7 +102,7 @@ load_artist_dimension_table = LoadDimensionOperator(
     dag=dag,
     redshift_conn_id="redshift",
     target_db="pipedb",
-    destination_table="",
+    destination_table="public.artists",
     sql=SqlQueries.artist_table_insert,
 )
 
@@ -110,7 +111,7 @@ load_time_dimension_table = LoadDimensionOperator(
     dag=dag,
     redshift_conn_id="redshift",
     target_db="pipedb",
-    destination_table="",
+    destination_table="public.time",
     sql=SqlQueries.time_table_insert,
 )
 
@@ -119,7 +120,6 @@ run_quality_checks = DataQualityOperator(
     dag=dag,
     redshift_conn_id="redshift",
     target_db="pipedb",
-    destination_table="",
     sql="",
 )
 
