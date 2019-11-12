@@ -128,12 +128,9 @@ end_task = DummyOperator(task_id="Stop_execution", dag=dag)
 start_task >> drop_tables_task >> create_tables_task >> [
     stage_events_to_redshift_task,
     stage_songs_to_redshift_task,
-] >> end_task
-
-# TODO - combine into one dag
-# start_task >> load_songplays_table >> [
-#     load_user_dimension_table,
-#     load_song_dimension_table,
-#     load_artist_dimension_table,
-#     load_time_dimension_table,
-# ] >> run_quality_checks >> end_task
+] >> load_songplays_table >> [
+    load_user_dimension_table,
+    load_song_dimension_table,
+    load_artist_dimension_table,
+    load_time_dimension_table,
+] >> run_quality_checks >> end_task
