@@ -32,7 +32,7 @@ Here is the DAG defining the sequence of these operations.
 
 ## Configuration Notes
 
-Here I am using my project's repository to store all my Airflow code and configuration files.  This folder is known as AIRFLOW_HOME and it is stored in the environment.  I set the AIRFLOW_HOME by running ```export AIRFLOW_HOME=`pwd`/airflow```.  
+Here I am using my project's repository to store all my Airflow code and configuration files.  This folder is known as AIRFLOW_HOME and it is stored in the environment.  I set the AIRFLOW_HOME by running `export AIRFLOW_HOME=`pwd`/airflow`.  
 
 Running Airflow locally is simplist using Docker.  The reason being without a full fledged database running (e.g., PostgreSQL) a local Python install is limited to running all tasks sequentially.
 
